@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <form th:action="@{/employees/add}" th:object="${employee}" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="name">Name</label>
+            <input type="text" th:field="*{name}" id="name" required />
+        </div>
+        <div>
+            <label for="age">Age</label>
+            <input type="number" th:field="*{age}" id="age" required />
+        </div>
+        <div>
+            <label for="status">Status</label>
+            <input type="text" th:field="*{status}" id="status" required />
+        </div>
+        <div>
+            <label for="department">Department</label>
+            <select th:field="*{department.id}" id="department" required>
+                <option value="">Select Department</option>
+                <option th:each="dept : ${departments}" 
+                        th:value="${dept.id}" 
+                        th:text="${dept.name}"></option>
+            </select>
+        </div>
+        <div>
+            <label for="file">Avatar</label>
+            <input type="file" name="file" id="file" accept="image/*" />
+        </div>
+        <button type="submit">Thêm</button>
+    </form>
+    <br/>
+    <a href="/employees">quay lại</a>
+</body>
+</html>

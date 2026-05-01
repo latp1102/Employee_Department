@@ -2,31 +2,45 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Department Employee</title>
 </head>
 <body>
-<table class="table" border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Department</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="employee : ${employees}">
-        <td scope="row" th:text="${employee.id}"></td>
-        <td th:text="${employee.name}"></td>
-        <td th:text="${employee.status}"></td>
-        <td th:text="${employee.department.name}"></td>
-        <td>
-            <a th:href="@{/employees/{id}/edit(id=${employee.id})}">Edit</a>
-            <a th:href="@{/employees/{id}/delete(id=${employee.id})}">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <a href="/employees/add">Thêm</a>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Avatar</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Status</th>
+            <th>Department</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="employee : ${employees}">
+            <td th:text="${employee.id}"></td>
+            <td>
+                <img th:if="${employee.avatar != null and !employee.avatar.isEmpty()}" 
+                     th:src="@{'/uploads/avatars/' + ${employee.avatar}}" 
+                     alt="Avatar" 
+                     class="avatar" />
+                <img th:unless="${employee.avatar != null and !employee.avatar.isEmpty()}" 
+                     src="https://via.placeholder.com/50" 
+                     alt="Default Avatar" 
+                     class="avatar" />
+            </td>
+            <td th:text="${employee.name}"></td>
+            <td th:text="${employee.age}"></td>
+            <td th:text="${employee.status}"></td>
+            <td th:text="${employee.department.name}"></td>
+            <td>
+                <a th:href="@{/employees/{id}/edit(id=${employee.id})}">Edit</a>
+                <a th:href="@{/employees/{id}/delete(id=${employee.id})}">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </body>
 </html>
