@@ -1,10 +1,13 @@
 package org.example.employee_department.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import org.example.employee_department.model.Employee;
 import org.example.employee_department.repository.EmployeeRepository;
 import org.example.employee_department.repository.DepartmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +22,28 @@ public class EmployeeController {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     @GetMapping("/employees")
-    public String listEmployees(Model model) {
-
-        model.addAttribute(
-                "employees",
-                employeeRepository.findAll()
-        );
+    public String listEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "name") String sort,
+            @RequestParam(defaultValue = "asc") String direction,
+            Model model) {
+        if (page < 0) {
+            page = 0;
+        }
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        Page<Employee> employeePage = employeeRepository.findEmployeesWithFilters(search, pageable);
+        model.addAttribute("employeePage", employeePage);
+        model.addAttribute("employees", employeePage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", employeePage.getTotalPages());
+        model.addAttribute("totalItems", employeePage.getTotalElements());
+        model.addAttribute("search", search);
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
+        model.addAttribute("size", size);
         return "employee-list";
     }
     @GetMapping("/employees/add")
@@ -33,7 +52,6 @@ public class EmployeeController {
         model.addAttribute(
                 "departments",departmentRepository.findAll()
         );
-
         return "employee-form";
     }
     @PostMapping("/employees/add")

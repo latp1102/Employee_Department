@@ -6,16 +6,45 @@
 </head>
 <body>
     <a href="/employees/add">Thêm</a>
-    <table border="1">
+    <div>
+        <form method="get" th:action="@{/employees}">
+            <input type="text" name="search" th:value="${search}" placeholder="Tìm theo tên nhân viên...">
+            <input type="hidden" name="sort" th:value="${sort}">
+            <input type="hidden" name="direction" th:value="${direction}">
+            <input type="hidden" name="size" th:value="${size}">
+            <button type="submit">Tìm kiếm</button>
+            <a th:href="@{/employees(sort=${sort}, direction=${direction}, size=${size})}">Xóa tìm kiếm</a>
+        </form>
+    </div>
+    <div>
+        <span>Sắp xếp theo: </span>
+        <a th:href="@{/employees(search=${search}, sort='name', direction=${sort == 'name' and direction == 'asc' ? 'desc' : 'asc'}, size=${size})}" 
+           class="sort-link">
+            Tên 
+            <span th:if="${sort == 'name'}">
+                <span th:if="${direction == 'asc'}">↑</span>
+                <span th:if="${direction == 'desc'}">↓</span>
+            </span>
+        </a>
+        |
+        <a th:href="@{/employees(search=${search}, sort='age', direction=${sort == 'age' and direction == 'asc' ? 'desc' : 'asc'}, size=${size})}">
+            Tuổi 
+            <span th:if="${sort == 'age'}">
+                <span th:if="${direction == 'asc'}">↑</span>
+                <span th:if="${direction == 'desc'}">↓</span>
+            </span>
+        </a>
+    </div>
+    <table border="1" th:if="${!employees.empty}">
         <thead>
         <tr>
             <th>ID</th>
             <th>Avatar</th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Status</th>
-            <th>Department</th>
-            <th>Action</th>
+            <th>Tên</th>
+            <th>Tuổi</th>
+            <th>Trạng thái</th>
+            <th>Phòng ban</th>
+            <th>Hành động</th>
         </tr>
         </thead>
         <tbody>
@@ -34,13 +63,38 @@
             <td th:text="${employee.name}"></td>
             <td th:text="${employee.age}"></td>
             <td th:text="${employee.status}"></td>
-            <td th:text="${employee.department.name}"></td>
+            <td th:text="${employee.department != null ? employee.department.name : 'N/A'}"></td>
             <td>
-                <a th:href="@{/employees/{id}/edit(id=${employee.id})}">Edit</a>
-                <a th:href="@{/employees/{id}/delete(id=${employee.id})}">Delete</a>
+                <a th:href="@{/employees/{id}/edit(id=${employee.id})}">Sửa</a>
+                <a th:href="@{/employees/{id}/delete(id=${employee.id})}">Xóa</a>
             </td>
         </tr>
         </tbody>
     </table>
+    <div th:if="${employees.empty}">
+        <p>Không tìm thấy nhân viên nào</p>
+    </div>
+    <div th:if="${totalPages > 0}">
+        <a th:if="${currentPage > 0}" 
+           th:href="@{/employees(page=${currentPage - 1}, search=${search}, sort=${sort}, direction=${direction}, size=${size})}">
+        </a>
+        <span th:if="${currentPage == 0}" ></span>
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <span th:if="${i == currentPage}" th:text="${i + 1}">1</span>
+            <a th:if="${i != currentPage}" 
+               th:href="@{/employees(page=${i}, search=${search}, sort=${sort}, direction=${direction}, size=${size})}"
+               th:text="${i + 1}">1</a>
+        </span>
+        <a th:if="${currentPage < totalPages - 1}" 
+           th:href="@{/employees(page=${currentPage + 1}, search=${search}, sort=${sort}, direction=${direction}, size=${size})}">
+            Trang sau &raquo;
+        </a>
+        <span th:if="${currentPage == totalPages - 1}" >Trang sau &raquo;</span>
+    </div>
+    <div th:if="${totalItems > 0}">
+        <p>Hiển thị <span th:text="${employees.size()}">0</span> 
+           trong tổng số <span th:text="${totalItems}">0</span> nhân viên
+           (Trang <span th:text="${currentPage + 1}">1</span>/<span th:text="${totalPages}">1</span>)</p>
+    </div>
 </body>
 </html>
